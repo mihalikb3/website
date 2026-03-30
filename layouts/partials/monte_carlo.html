@@ -1,0 +1,144 @@
+<div class="mc-widget">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="h5 m-0" style="color: var(--text-main); font-family: 'JetBrains Mono', monospace;">GBM_DIFFUSION_MATRIX</h3>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 6px; color: var(--accent);">
+            σ: <span id="volValue">20%</span>
+        </div>
+    </div>
+    
+    <div style="margin-bottom: 30px;">
+        <input type="range" id="volSlider" min="5" max="80" value="20" step="1" class="custom-slider">
+    </div>
+
+    <div style="position: relative; height: 400px; width: 100%;">
+        <canvas id="mcChart"></canvas>
+    </div>
+</div>
+
+<style>
+    .custom-slider {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 4px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 2px;
+        outline: none;
+    }
+
+    .custom-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        background: var(--accent);
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+        transition: all 0.2s ease-in-out;
+    }
+
+    .custom-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+        box-shadow: 0 0 15px rgba(99, 102, 241, 0.8);
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/js/mc_engine.js"></script>
+
+<script>
+    let mcModule;
+    let chart;
+
+    const ctx = document.getElementById('mcChart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: Array.from({length: 253}, (_, i) => i), datasets: [] },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            elements: { point: { radius: 0 }, line: { tension: 0.1 } },
+            scales: {
+                y: { 
+                    min: 60, max: 180, 
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }
+                },
+                x: { 
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }
+                }
+            },
+            plugins: { legend: { display: false } },
+            animation: {
+                x: {
+                    type: 'number',
+                    easing: 'linear',
+                    duration: 400,
+                    from: NaN,
+                    delay(ctx) {
+                        if (ctx.type !== 'data' || ctx.xStarted) return 0;
+                        ctx.xStarted = true;
+                        return ctx.index * 1.5;
+                    }
+                },
+                y: {
+                    type: 'number',
+                    easing: 'linear',
+                    duration: 400,
+                    from: NaN,
+                    delay(ctx) {
+                        if (ctx.type !== 'data' || ctx.yStarted) return 0;
+                        ctx.yStarted = true;
+                        return ctx.index * 1.5;
+                    }
+                }
+            }
+        }
+    });
+
+    if (typeof Module === 'function') {
+        Module().then(instance => {
+            mcModule = instance;
+            updateSimulation();
+        });
+    }
+
+    const slider = document.getElementById('volSlider');
+    slider.oninput = function() {
+        document.getElementById('volValue').innerText = this.value + "%";
+        updateSimulation();
+    };
+
+    function updateSimulation() {
+        if (!mcModule) return;
+        const vol = slider.value / 100.0;
+        const numPaths = 12; 
+        chart.data.datasets = []; 
+
+        const colors = [
+            'rgba(99, 102, 241, 0.4)', // Indigo
+            'rgba(168, 85, 247, 0.4)', // Purple
+            'rgba(236, 72, 153, 0.4)', // Pink
+            'rgba(45, 212, 191, 0.4)'  // Teal
+        ];
+
+        for (let p = 0; p < numPaths; p++) {
+            // Incorporate volatility into the seed so the Brownian motion (shape) 
+            // changes as you slide, instead of just scaling the same path.
+            const seed = 42 + p + Math.floor(vol * 10000); 
+            const rawPath = mcModule.get_sample_path(100.0, 0.05, vol, 1.0, 252, seed);
+            const jsPath = [];
+            for (let i = 0; i < rawPath.size(); i++) jsPath.push(rawPath.get(i));
+
+            chart.data.datasets.push({
+                data: jsPath,
+                borderColor: colors[p % colors.length],
+                borderWidth: p === 0 ? 3 : 1.5, // Emphasize the first path
+                fill: false
+            });
+        }
+        chart.update('none'); // Update without full animation for smoother sliding
+        chart.update(); // Then apply drawing animation
+    }
+</script>

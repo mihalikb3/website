@@ -1,0 +1,45 @@
+{{ define "main" }}
+<div class="row align-items-center mb-5">
+    <div class="col-lg-12 text-center">
+        <h1 class="display-3 fw-bold mb-3 text-gradient">Quant Matrix Simulation</h1>
+        <p class="fs-5 text-muted mx-auto" style="max-width: 700px; font-weight: 300;">
+            Real-time <span class="text-white" style="font-weight: 500;">Monte Carlo diffusion</span> for Geometric Brownian Motion, 
+            computed with native C++ execution speeds in your browser.
+        </p>
+    </div>
+</div>
+
+<div class="glass-card mb-5">
+    {{ partial "monte_carlo.html" . }}
+</div>
+
+<div class="row g-4 mt-5">
+    <div class="col-md-4">
+        <div class="h-100 p-4 rounded-4" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+            <div class="text-primary mb-3">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+            </div>
+            <h5 class="fw-bold">C++ 20 Core</h5>
+            <p class="small text-muted mb-0">Engineered with modern C++ for ultra-low latency path generation and high-precision stochastic modeling.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="h-100 p-4 rounded-4" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+            <div class="text-info mb-3">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </div>
+            <h5 class="fw-bold">WASM Runtime</h5>
+            <p class="small text-muted mb-0">WebAssembly bridge ensures near-native speeds, bypassing JavaScript's heavy computation overhead.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="h-100 p-4 rounded-4" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+            <div class="text-success mb-3">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            </div>
+            <h5 class="fw-bold">Path Diffusion</h5>
+            <p class="small text-muted mb-0">Supports multi-threaded simulation patterns for complex derivative pricing and risk analysis.</p>
+        </div>
+    </div>
+</div>
+{{ end }}
