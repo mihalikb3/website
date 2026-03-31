@@ -1,12 +1,18 @@
 <div class="mc-widget">
-    <div style="display: flex; gap: 20px; align-items: flex-end; margin-bottom: 30px; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 150px;">
-            <label style="display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-bottom: 8px;">VOLATILITY (%)</label>
+    <!-- Main Controls -->
+    <div style="display: flex; gap: 15px; align-items: flex-end; margin-bottom: 30px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 120px;">
+            <label style="display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 8px;">RATE r (%)</label>
+            <input type="number" id="rateInput" value="3" min="0" max="100" step="0.1" 
+                   style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
+        </div>
+        <div style="flex: 1; min-width: 120px;">
+            <label style="display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 8px;">VOLATILITY σ (%)</label>
             <input type="number" id="volInput" value="20" min="1" max="500" step="0.5" 
                    style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
         </div>
-        <div style="flex: 1; min-width: 150px;">
-            <label style="display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-bottom: 8px;">NUMBER OF PATHS</label>
+        <div style="flex: 1; min-width: 120px;">
+            <label style="display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 8px;">SIMS (PATHS)</label>
             <input type="number" id="pathInput" value="250" min="1" max="5000" 
                    style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-family: 'JetBrains Mono', monospace;">
         </div>
@@ -18,17 +24,24 @@
         </div>
     </div>
 
-    <div style="display: flex; gap: 0; height: 450px; width: 100%; margin-bottom: 20px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
-        <div style="flex: 4; position: relative;">
-            <canvas id="mcChart"></canvas>
+    <!-- Plot Area -->
+    <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 20px; margin-bottom: 20px;">
+        <div style="background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 20px; display: flex; flex-direction: column;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-bottom: 15px;">PRICE_EVOLUTION_PATHS</div>
+            <div style="flex-grow: 1; position: relative; height: 350px;">
+                <canvas id="mcChart"></canvas>
+            </div>
         </div>
-        <div style="flex: 1; position: relative; border-left: 1px solid #f0f0f0;">
-            <canvas id="distChart"></canvas>
+        <div style="background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 20px; display: flex; flex-direction: column;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-bottom: 15px;">DISTRIBUTION</div>
+            <div style="flex-grow: 1; position: relative; height: 350px;">
+                <canvas id="distChart"></canvas>
+            </div>
         </div>
     </div>
 
     <!-- Greeks Display -->
-    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 30px;" id="greeks-container">
+    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 30px;" id="greeks-container">
         <div style="padding: 10px; border: 1px solid var(--border); border-radius: 8px; text-align: center;">
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 4px;">DELTA</div>
             <div style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.9rem;" id="delta-value">0.0000</div>
@@ -49,6 +62,74 @@
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 4px;">RHO</div>
             <div style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.9rem;" id="rho-value">0.0000</div>
         </div>
+        <div style="padding: 10px; border: 1px solid var(--border); border-radius: 8px; text-align: center; background: #f8fafc;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--accent); margin-bottom: 4px;">PROB. PROFIT</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.9rem; color: var(--accent);" id="pop-value">0.0%</div>
+        </div>
+    </div>
+
+    <!-- Heatmap Section -->
+    <div style="margin-top: 50px; border-top: 1px solid var(--border); padding-top: 30px;">
+        <h3 style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--accent); margin-bottom: 25px;">OPTION_PRICE_SURFACE_HEATMAP</h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 25px; align-items: flex-end;">
+            <div>
+                <label style="display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 6px;">OPTION TYPE</label>
+                <select id="optType" style="width: 100%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.8rem; background: #fff;">
+                    <option value="european">European</option>
+                    <option value="asian">Asian</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 6px;">METRIC (Z-AXIS)</label>
+                <select id="metricType" style="width: 100%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.8rem; background: #fff;">
+                    <option value="price">Price</option>
+                    <option value="delta">Delta (Δ)</option>
+                    <option value="gamma">Gamma (Γ)</option>
+                    <option value="vega">Vega (ν)</option>
+                    <option value="theta">Theta (Θ)</option>
+                    <option value="rho">Rho (ρ)</option>
+                    <option value="prob_profit">Prob. Profit</option>
+                    <option value="std_error">Std Error</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 6px;">RATE r (%)</label>
+                <input type="number" id="heatRate" value="3" min="0" max="100" step="0.1" 
+                       style="width: 100%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.8rem;">
+            </div>
+            <div>
+                <label style="display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 6px;">SPOT_MIN / MAX</label>
+                <div style="display: flex; gap: 5px;">
+                    <input type="number" id="spotMin" value="80" style="width: 50%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.8rem;">
+                    <input type="number" id="spotMax" value="120" style="width: 50%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.8rem;">
+                </div>
+            </div>
+            <div>
+                <label style="display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 6px;">VOL_MIN / MAX (%)</label>
+                <div style="display: flex; gap: 5px;">
+                    <input type="number" id="vMin" value="10" style="width: 50%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.8rem;">
+                    <input type="number" id="vMax" value="50" style="width: 50%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.8rem;">
+                </div>
+            </div>
+            <div>
+                <label style="display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 6px;">RESOLUTION</label>
+                <input type="number" id="steps" value="20" min="5" max="50" style="width: 100%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.8rem;">
+            </div>
+            <div>
+                <label style="display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 6px;">SIMS/CELL</label>
+                <input type="number" id="heatSims" value="1000" min="100" max="100000" step="100" style="width: 100%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.8rem;">
+            </div>
+            <div>
+                <button id="heatButton" style="width: 100%; padding: 8px; background: var(--accent); color: #fff; border: none; border-radius: 4px; font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; height: 35px;">
+                    Generate
+                </button>
+            </div>
+        </div>
+
+        <div style="position: relative; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 20px; text-align: center;">
+            <canvas id="heatChart" style="max-width: 100%; height: 400px;"></canvas>
+        </div>
     </div>
 </div>
 
@@ -60,33 +141,34 @@
     let chart;
     let distChart;
 
-    const FIXED_Y_WIDTH = 45;
-    const FIXED_X_HEIGHT = 25;
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: { legend: { display: false } }
+    };
+
+    const yAxisConfig = {
+        type: 'linear',
+        grid: { color: '#f5f5f5', drawBorder: false },
+        ticks: { color: '#999', font: { family: 'JetBrains Mono', size: 9 } }
+    };
 
     const ctx = document.getElementById('mcChart').getContext('2d');
     chart = new Chart(ctx, {
         type: 'line',
         data: { labels: Array.from({length: 253}, (_, i) => i), datasets: [] },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: { padding: 0 },
+            ...chartOptions,
             elements: { point: { radius: 0 }, line: { tension: 0.1 } },
             scales: {
-                y: { 
-                    type: 'linear',
-                    grid: { color: '#f0f0f0', drawBorder: false },
-                    ticks: { color: '#999', font: { family: 'JetBrains Mono', size: 9 } },
-                    afterFit: (scale) => { scale.width = FIXED_Y_WIDTH; }
-                },
+                y: { ...yAxisConfig, title: { display: true, text: 'Price ($)', font: { size: 10 } } },
                 x: { 
-                    grid: { color: '#f0f0f0', drawBorder: false },
+                    grid: { color: '#f5f5f5', drawBorder: false },
                     ticks: { color: '#999', font: { family: 'JetBrains Mono', size: 9 } },
-                    afterFit: (scale) => { scale.height = FIXED_X_HEIGHT; }
+                    title: { display: true, text: 'Time (T=1.0)', font: { size: 10 } }
                 }
-            },
-            plugins: { legend: { display: false } },
-            animation: false
+            }
         }
     });
 
@@ -96,26 +178,15 @@
         data: { datasets: [] },
         options: {
             indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: { padding: 0 },
+            ...chartOptions,
             scales: {
                 x: { 
-                    grid: { display: false },
-                    ticks: { display: false },
-                    afterFit: (scale) => { scale.height = FIXED_X_HEIGHT; }
+                    grid: { color: '#f5f5f5' },
+                    ticks: { color: '#999', font: { family: 'JetBrains Mono', size: 8 } },
+                    title: { display: true, text: 'Freq', font: { size: 10 } }
                 },
-                y: { 
-                    type: 'linear',
-                    display: true,
-                    position: 'right', 
-                    grid: { display: false },
-                    ticks: { display: false },
-                    afterFit: (scale) => { scale.width = 0; }
-                }
-            },
-            plugins: { legend: { display: false } },
-            animation: false
+                y: { ...yAxisConfig, title: { display: false } }
+            }
         }
     });
 
@@ -126,6 +197,7 @@
         });
     }
 
+    const rateInput = document.getElementById('rateInput');
     const volInput = document.getElementById('volInput');
     const pathInput = document.getElementById('pathInput');
     const calcButton = document.getElementById('calcButton');
@@ -135,10 +207,10 @@
     function updateSimulation() {
         if (!mcModule) return;
         
+        const rate = parseFloat(rateInput.value) / 100.0;
         const vol = parseFloat(volInput.value) / 100.0;
         const numPaths = parseInt(pathInput.value) || 1;
         const spot = 100.0;
-        const drift = 0.05;
         const T = 1.0;
         
         chart.data.datasets = []; 
@@ -151,7 +223,8 @@
 
         for (let p = 0; p < numPaths; p++) {
             const seed = baseSeed + p; 
-            const rawPath = mcModule.get_sample_path(spot, drift, vol, T, 252, seed);
+            // Correct call: using rate for drift as expected by standard GBM Wasm
+            const rawPath = mcModule.get_sample_path(spot, rate, vol, T, 252, seed);
             const jsPath = [];
             for (let i = 0; i < rawPath.size(); i++) {
                 const val = rawPath.get(i);
@@ -195,7 +268,7 @@
             });
         }
 
-        const padding = (globalMax - globalMin) * 0.05;
+        const padding = (globalMax - globalMin) * 0.1;
         const yMin = globalMin - padding;
         const yMax = globalMax + padding;
 
@@ -205,8 +278,13 @@
 
         updateDistribution(finalPrices, avgFinalPrice, spot, yMin, yMax);
 
+        const profitablePaths = finalPrices.filter(p => p > spot).length;
+        const pop = (profitablePaths / numPaths) * 100;
+        document.getElementById('pop-value').innerText = pop.toFixed(1) + "%";
+
         try {
-            const greeks = mcModule.get_greeks("european", spot, 100.0, drift, vol, T, 252, 1000, 42);
+            const greeksCount = Math.min(Math.max(numPaths, 1000), 5000);
+            const greeks = mcModule.get_greeks("european", spot, 100.0, rate, vol, T, 252, greeksCount, baseSeed);
             document.getElementById('delta-value').innerText = greeks.delta.toFixed(4);
             document.getElementById('gamma-value').innerText = greeks.gamma.toFixed(4);
             document.getElementById('vega-value').innerText = greeks.vega.toFixed(2);
@@ -221,10 +299,9 @@
         distChart.options.scales.y.min = minP;
         distChart.options.scales.y.max = maxP;
 
-        const binCount = 50; 
+        const binCount = 40; 
         const binWidth = (maxP - minP) / binCount;
         const binData = [];
-        
         for(let i=0; i<binCount; i++) {
             const low = minP + i * binWidth;
             const high = low + binWidth;
@@ -234,10 +311,10 @@
         }
 
         const maxFreq = Math.max(...binData.map(d => d.x), 1);
-
         distChart.data.datasets = [
             {
                 type: 'bar',
+                label: 'Frequency',
                 data: binData,
                 backgroundColor: 'rgba(37, 99, 235, 0.5)',
                 borderColor: 'rgba(37, 99, 235, 0.8)',
@@ -248,7 +325,7 @@
             },
             {
                 type: 'line',
-                data: [{x: 0, y: avgFinalPrice}, {x: maxFreq * 2, y: avgFinalPrice}],
+                data: [{x: 0, y: avgFinalPrice}, {x: maxFreq * 1.5, y: avgFinalPrice}],
                 borderColor: '#000',
                 borderWidth: 2,
                 pointRadius: 0,
@@ -257,7 +334,7 @@
             },
             {
                 type: 'line',
-                data: [{x: 0, y: spot}, {x: maxFreq * 2, y: spot}],
+                data: [{x: 0, y: spot}, {x: maxFreq * 1.5, y: spot}],
                 borderColor: 'rgba(239, 68, 68, 0.7)',
                 borderWidth: 1.5,
                 borderDash: [4, 4],
@@ -266,7 +343,134 @@
                 order: 2
             }
         ];
-
         distChart.update();
+    }
+
+    const heatButton = document.getElementById('heatButton');
+    heatButton.addEventListener('click', generateHeatmap);
+
+    function generateHeatmap() {
+        if (!mcModule) return;
+
+        const type = document.getElementById('optType').value;
+        const metric = document.getElementById('metricType').value;
+        const strike = 100.0;
+        const rate = parseFloat(rateInput.value) / 100.0; // Consolidation: using main rateInput
+        const expiry = 1.0;
+        const sMin = parseFloat(document.getElementById('spotMin').value);
+        const sMax = parseFloat(document.getElementById('spotMax').value);
+        const vMin = parseFloat(document.getElementById('vMin').value) / 100.0;
+        const vMax = parseFloat(document.getElementById('vMax').value) / 100.0;
+        const steps = parseInt(document.getElementById('steps').value);
+        const numSims = parseInt(document.getElementById('heatSims').value) || 1000;
+
+        try {
+            const rawData = mcModule.get_price_heatmap(type, metric, strike, rate, expiry, sMin, sMax, steps, vMin, vMax, steps, numSims, 42);
+            const data = [];
+            for (let i = 0; i < rawData.size(); i++) data.push(rawData.get(i));
+            renderHeatmap(data, steps, sMin, sMax, vMin * 100, vMax * 100, metric.toUpperCase());
+        } catch (err) {
+            console.error("Heatmap generation failed:", err);
+        }
+    }
+
+    function renderHeatmap(data, steps, sMin, sMax, vMin, vMax, label) {
+        const canvas = document.getElementById('heatChart');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width = 650; 
+        const height = canvas.height = 400;
+        const margin = { top: 30, right: 80, bottom: 45, left: 55 };
+        const plotW = width - margin.left - margin.right;
+        const plotH = height - margin.top - margin.bottom;
+        const cellW = plotW / steps;
+        const cellH = plotH / steps;
+        const maxPrice = Math.max(...data);
+        const minPrice = Math.min(...data);
+
+        const getColor = (val) => {
+            const t = (val - minPrice) / (maxPrice - minPrice || 1);
+            const stops = [
+                {t: 0.00, r: 68,  g: 1,   b: 84},  
+                {t: 0.25, r: 59,  g: 82,  b: 139}, 
+                {t: 0.50, r: 33,  g: 145, b: 140}, 
+                {t: 0.75, r: 94,  g: 201, b: 98},  
+                {t: 1.00, r: 253, g: 231, b: 37}   
+            ];
+            let i = 1;
+            while (i < stops.length - 1 && t > stops[i].t) i++;
+            const s1 = stops[i-1], s2 = stops[i];
+            const weight = (t - s1.t) / (s2.t - s1.t);
+            return `rgb(${Math.floor(s1.r + (s2.r - s1.r) * weight)}, ${Math.floor(s1.g + (s2.g - s1.g) * weight)}, ${Math.floor(s1.b + (s2.b - s1.b) * weight)})`;
+        };
+
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < steps; i++) { 
+            for (let j = 0; j < steps; j++) { 
+                const price = data[i * steps + j];
+                ctx.fillStyle = getColor(price);
+                ctx.fillRect(margin.left + j * cellW, margin.top + plotH - (i + 1) * cellH, cellW + 0.5, cellH + 0.5);
+            }
+        }
+
+        const barW = 15, barX = width - margin.right + 25;
+        for (let i = 0; i < plotH; i++) {
+            const val = minPrice + (i / plotH) * (maxPrice - minPrice);
+            ctx.fillStyle = getColor(val);
+            ctx.fillRect(barX, margin.top + plotH - i, barW, 1);
+        }
+        
+        ctx.fillStyle = "#666";
+        ctx.font = "9px JetBrains Mono";
+        ctx.textAlign = "left";
+        for (let i = 0; i <= 4; i++) {
+            const y = margin.top + plotH - (i / 4) * plotH;
+            const val = minPrice + (i / 4) * (maxPrice - minPrice);
+            let text = val.toFixed(2);
+            if (label === "PROB_PROFIT") text = (val * 100).toFixed(1) + "%";
+            ctx.fillText(text, barX + barW + 5, y + 3);
+        }
+        ctx.fillText(label, barX, margin.top - 8);
+
+        const strike = 100.0;
+        if (strike >= sMin && strike <= sMax) {
+            const strikeX = margin.left + ((strike - sMin) / (sMax - sMin)) * plotW;
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.setLineDash([5, 5]);
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(strikeX, margin.top);
+            ctx.lineTo(strikeX, margin.top + plotH);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = "#fff";
+            ctx.font = "bold 9px JetBrains Mono";
+            ctx.textAlign = "center";
+            ctx.fillText("K=100", strikeX, margin.top + 15);
+        }
+        
+        ctx.fillStyle = "#666";
+        ctx.font = "10px JetBrains Mono";
+        ctx.textAlign = "center";
+        for (let j = 0; j <= 5; j++) {
+            const x = margin.left + (j / 5) * plotW;
+            const val = sMin + (j / 5) * (sMax - sMin);
+            ctx.fillText(val.toFixed(0), x, margin.top + plotH + 20);
+        }
+        ctx.textAlign = "right";
+        for (let i = 0; i <= 5; i++) {
+            const y = margin.top + plotH - (i / 5) * plotH;
+            const val = vMin + (i / 5) * (vMax - vMin);
+            ctx.fillText(val.toFixed(0) + "%", margin.left - 8, y + 4);
+        }
+
+        ctx.fillStyle = "#999";
+        ctx.font = "bold 9px JetBrains Mono";
+        ctx.textAlign = "left";
+        ctx.fillText("VOLATILITY σ ↑", margin.left, margin.top - 10);
+        ctx.textAlign = "right";
+        ctx.fillText("ASSET PRICE S →", margin.left + plotW, margin.top + plotH + 35);
+
+        ctx.strokeStyle = "#eee";
+        ctx.strokeRect(margin.left, margin.top, plotW, plotH);
     }
 </script>
