@@ -1,3 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monte Carlo Simulation | Portfolio</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #1a1a1a;
+            --muted: #666666;
+            --accent: #000000;
+            --border: #eeeeee;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 40px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-decoration: none;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+
+        .menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        .menu a:hover, .menu a.active {
+            color: var(--accent);
+        }
+
+        main {
+            min-height: 60vh;
+        }
+
+        h1, h2, h3, h4 {
+            color: var(--accent);
+            letter-spacing: -0.02em;
+        }
+
+        h1 { font-size: 2.5rem; margin-bottom: 20px; }
+        
+        .description {
+            font-size: 1.2rem;
+            color: var(--muted);
+            margin-bottom: 40px;
+        }
+
+        footer {
+            padding: 60px 0 40px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            margin-top: 60px;
+        }
+
+        code, pre {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #f5f5f5;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .content {
+            margin-top: 20px;
+        }
+
+        .content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .content a {
+            color: var(--accent);
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+         
+        .project-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 40px;
+        }
+
+        .project-item {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .project-item:last-child {
+            border-bottom: none;
+        }
+
+        .project-item h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.4rem;
+        }
+
+        .project-item a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .project-item a:hover h3 {
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        .project-item p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+            max-width: 600px;
+        }
+
+         
+        .mc-widget {
+            margin-top: 40px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="/" class="brand">Portfolio</a>
+                <div class="menu">
+                    
+                    
+                        <a href="/" class="">Home</a>
+                    
+                        <a href="/projects/" class="">Projects</a>
+                    
+                        <a href="/about/" class="">About</a>
+                    
+                        <a href="/contact/" class="">Contact</a>
+                    
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        
+    <article>
+        <h1>Monte Carlo Simulation</h1>
+        <div class="content">
+            <p>This project demonstrates a high-performance Monte Carlo simulation for Geometric Brownian Motion, implemented in C++ and compiled to WebAssembly.</p>
 <div class="mc-widget">
     <div style="display: flex; gap: 20px; align-items: flex-end; margin-bottom: 30px; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 150px;">
@@ -27,7 +223,7 @@
         </div>
     </div>
 
-    <!-- Greeks Display -->
+    
     <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 30px;" id="greeks-container">
         <div style="padding: 10px; border: 1px solid var(--border); border-radius: 8px; text-align: center;">
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-bottom: 4px;">DELTA</div>
@@ -270,3 +466,16 @@
         distChart.update();
     }
 </script>
+
+
+
+        </div>
+    </article>
+
+    </main>
+
+    <footer class="container">
+        &copy; 2026 Portfolio &bull; Portfolio Site
+    </footer>
+</body>
+</html>

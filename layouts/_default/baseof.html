@@ -3,92 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ .Site.Title }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-deep: #020617; /* Darker Slate 950 */
-            --bg-card: rgba(15, 23, 42, 0.8); /* Darker, more opaque */
-            --accent: #818cf8; /* Lighter Indigo 400 for better pop */
-            --text-main: #f1f5f9; /* Slate 100 */
-            --text-muted: #cbd5e1; /* Slate 300 - much higher contrast */
-            --border: rgba(255, 255, 255, 0.15);
-        }
-        
-        body { 
-            background-color: var(--bg-deep); 
-            color: var(--text-main); 
-            font-family: 'Inter', sans-serif;
-            letter-spacing: -0.01em;
-            background-image: radial-gradient(circle at 50% -20%, #1e1b4b 0%, var(--bg-deep) 100%);
-            min-height: 100vh;
+            --bg: #ffffff;
+            --text: #1a1a1a;
+            --muted: #666666;
+            --accent: #000000;
+            --border: #eeeeee;
         }
 
-        .navbar { 
-            background: rgba(2, 6, 23, 0.8);
-            backdrop-filter: blur(12px);
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 40px 0;
             border-bottom: 1px solid var(--border);
-            padding: 1rem 0;
+            margin-bottom: 40px;
         }
 
-        .navbar-brand {
-            font-weight: 700;
-            color: var(--text-main) !important;
-            letter-spacing: -0.04em;
+        nav {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
         }
 
-        .brand-logo {
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, var(--accent), #c084fc);
-            border-radius: 6px;
+        .brand {
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-decoration: none;
+            color: var(--text);
+            letter-spacing: -0.02em;
         }
 
-        .glass-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        .menu {
+            display: flex;
+            gap: 20px;
         }
 
-        .main-container { max-width: 1000px; margin: 60px auto; padding: 0 20px; }
+        .menu a {
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        .menu a:hover, .menu a.active {
+            color: var(--accent);
+        }
+
+        main {
+            min-height: 60vh;
+        }
+
+        h1, h2, h3, h4 {
+            color: var(--accent);
+            letter-spacing: -0.02em;
+        }
+
+        h1 { font-size: 2.5rem; margin-bottom: 20px; }
         
-        h1, h2, h3 { font-weight: 700; letter-spacing: -0.03em; color: #fff; }
-        .text-gradient {
-            background: linear-gradient(to right, #fff, var(--text-muted));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .description {
+            font-size: 1.2rem;
+            color: var(--muted);
+            margin-bottom: 40px;
         }
 
-        code, pre { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
+        footer {
+            padding: 60px 0 40px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            margin-top: 60px;
+        }
 
-        .text-muted { color: var(--text-muted) !important; }
+        code, pre {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #f5f5f5;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .content {
+            margin-top: 20px;
+        }
+
+        .content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .content a {
+            color: var(--accent);
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        /* Project card/list styles */
+        .project-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 40px;
+        }
+
+        .project-item {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .project-item:last-child {
+            border-bottom: none;
+        }
+
+        .project-item h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.4rem;
+        }
+
+        .project-item a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .project-item a:hover h3 {
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        .project-item p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+            max-width: 600px;
+        }
+
+        /* Monte Carlo Widget Styling Overrides */
+        .mc-widget {
+            margin-top: 40px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fafafa;
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar sticky-top">
+    <header>
         <div class="container">
-            <a class="navbar-brand" href="/">
-                <div class="brand-logo"></div>
-                QUANT_ENGINE
-            </a>
+            <nav>
+                <a href="/" class="brand">{{ .Site.Title }}</a>
+                <div class="menu">
+                    {{ $currentPage := . }}
+                    {{ range .Site.Menus.main }}
+                        <a href="{{ .URL }}" class="{{ if $currentPage.IsMenuCurrent "main" . }}active{{ end }}{{ if $currentPage.HasMenuCurrent "main" . }}active{{ end }}">{{ .Name }}</a>
+                    {{ end }}
+                </div>
+            </nav>
         </div>
-    </nav>
+    </header>
 
-    <div class="main-container">
+    <main class="container">
         {{ block "main" . }}{{ end }}
-    </div>
+    </main>
 
-    <footer class="text-center py-5 text-muted small" style="opacity: 0.5;">
-        &copy; {{ now.Format "2006" }} QUANT_PORTFOLIO &bull; POWERED BY C++ WASM
+    <footer class="container">
+        &copy; {{ now.Format "2006" }} {{ .Site.Title }} &bull; Portfolio Site
     </footer>
 </body>
 </html>

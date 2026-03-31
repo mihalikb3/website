@@ -1,18 +1,19 @@
 {{ define "main" }}
-<div class="bg-white p-5 rounded-4 shadow-sm">
-    <div class="text-center mb-5">
-        <h1 class="display-5 fw-bold mb-3">Monte Carlo Pricing Dashboard</h1>
-        <p class="text-muted fs-5">Interactive Geometric Brownian Motion Diffusion powered by a C++ WebAssembly engine.</p>
-    </div>
+    <section>
+        <h1>{{ .Title }}</h1>
+        <div class="description">
+            {{ .Content }}
+        </div>
 
-    <!-- The C++ Wasm Engine Widget -->
-    <div class="my-4">
-        {{ partial "monte_carlo.html" . }}
-    </div>
-
-    <div class="mt-5 pt-4 border-top">
-        <h3 class="h4 fw-bold">About the C++ Core</h3>
-        <p class="text-muted mb-0">The core simulation logic is written in high-performance C++20 and compiled into WebAssembly using Emscripten for real-time execution in the browser. This allows for low-latency, high-precision stochastic path generation directly on the client side.</p>
-    </div>
-</div>
+        <ul class="project-list">
+            {{ range .Pages }}
+            <li class="project-item">
+                <a href="{{ .RelPermalink }}">
+                    <h3>{{ .Title }}</h3>
+                    <p>{{ .Params.description }}</p>
+                </a>
+            </li>
+            {{ end }}
+        </ul>
+    </section>
 {{ end }}
