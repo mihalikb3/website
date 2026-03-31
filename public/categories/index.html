@@ -4,18 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quant Engine</title>
-    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; color: #333; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        .navbar { background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .main-container { max-width: 900px; margin: 40px auto; padding: 20px; }
+        :root {
+            --bg-deep: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --accent: #6366f1;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;  
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body { 
+            background-color: var(--bg-deep); 
+            color: var(--text-main); 
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.01em;
+            background-image: radial-gradient(circle at 50% -20%, #1e1b4b 0%, var(--bg-deep) 100%);
+            min-height: 100vh;
+        }
+
+        .navbar { 
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--text-main) !important;
+            letter-spacing: -0.04em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 6px;
+        }
+
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .main-container { max-width: 1000px; margin: 60px auto; padding: 0 20px; }
+        
+        h1, h2, h3 { font-weight: 700; letter-spacing: -0.03em; }
+        .text-gradient {
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        code, pre { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar sticky-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/">Quant Engine</a>
+            <a class="navbar-brand" href="/">
+                <div class="brand-logo"></div>
+                QUANT_ENGINE
+            </a>
         </div>
     </nav>
 
@@ -29,33 +91,80 @@
 
     
     <div class="my-4">
-        <div class="mc-widget" style="background: #f9f9f9; padding: 25px; border-radius: 12px; border: 1px solid #eee; margin: 30px 0;">
-    <h3 style="margin-top: 0;">Quant Portfolio: Real-Time GBM Diffusion</h3>
+        <div class="mc-widget">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="h5 m-0" style="color: var(--text-main); font-family: 'JetBrains Mono', monospace;">GBM_DIFFUSION_MATRIX</h3>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 6px; color: var(--accent);">
+            σ: <span id="volValue">20%</span>
+        </div>
+    </div>
     
-    <div style="margin-bottom: 20px;">
-        <label style="font-weight: bold; display: block; margin-bottom: 10px;">
-            Asset Volatility (σ): <span id="volValue" style="color: #007bff;">20%</span>
-        </label>
-        <input type="range" id="volSlider" min="5" max="80" value="20" step="1" style="width: 100%; cursor: pointer;">
-        <p style="font-size: 0.85em; color: #666; margin-top: 5px;">
-            Dragging this slider changes the <strong>Temperature</strong> of the simulation in real-time.
-        </p>
+    <div style="margin-bottom: 30px;">
+        <input type="range" id="volSlider" min="5" max="80" value="20" step="1" class="custom-slider">
     </div>
 
-    <div style="position: relative; height: 350px; width: 100%;">
+    <div style="position: relative; height: 400px; width: 100%;">
         <canvas id="mcChart"></canvas>
+    </div>
+
+    
+    <div class="row g-3 mt-4" id="greeks-container">
+        <div class="col-md-4">
+            <div class="p-3 rounded-3" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); text-align: center;">
+                <div class="small text-muted mb-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">Δ DELTA</div>
+                <div class="h5 m-0 text-white fw-bold" id="delta-value" style="font-family: 'JetBrains Mono', monospace;">0.0000</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 rounded-3" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); text-align: center;">
+                <div class="small text-muted mb-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">Γ GAMMA</div>
+                <div class="h5 m-0 text-white fw-bold" id="gamma-value" style="font-family: 'JetBrains Mono', monospace;">0.0000</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 rounded-3" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); text-align: center;">
+                <div class="small text-muted mb-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">ν VEGA</div>
+                <div class="h5 m-0 text-white fw-bold" id="vega-value" style="font-family: 'JetBrains Mono', monospace;">0.0000</div>
+            </div>
+        </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .custom-slider {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 4px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 2px;
+        outline: none;
+    }
 
+    .custom-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        background: var(--accent);
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+        transition: all 0.2s ease-in-out;
+    }
+
+    .custom-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+        box-shadow: 0 0 15px rgba(99, 102, 241, 0.8);
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="/js/mc_engine.js"></script>
 
 <script>
     let mcModule;
     let chart;
 
-    
     const ctx = document.getElementById('mcChart').getContext('2d');
     chart = new Chart(ctx, {
         type: 'line',
@@ -63,58 +172,99 @@
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            elements: { point: { radius: 0 } },
+            elements: { point: { radius: 0 }, line: { tension: 0.1 } },
             scales: {
-                y: { min: 40, max: 200, title: { display: true, text: 'Asset Price ($)' } },
-                x: { title: { display: true, text: 'Trading Days' } }
+                y: { 
+                    min: 60, max: 180, 
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }
+                },
+                x: { 
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }
+                }
             },
             plugins: { legend: { display: false } },
-            animation: { duration: 150 }
+            animation: {
+                x: {
+                    type: 'number',
+                    easing: 'linear',
+                    duration: 400,
+                    from: NaN,
+                    delay(ctx) {
+                        if (ctx.type !== 'data' || ctx.xStarted) return 0;
+                        ctx.xStarted = true;
+                        return ctx.index * 1.5;
+                    }
+                },
+                y: {
+                    type: 'number',
+                    easing: 'linear',
+                    duration: 400,
+                    from: NaN,
+                    delay(ctx) {
+                        if (ctx.type !== 'data' || ctx.yStarted) return 0;
+                        ctx.yStarted = true;
+                        return ctx.index * 1.5;
+                    }
+                }
+            }
         }
     });
 
-    
     if (typeof Module === 'function') {
         Module().then(instance => {
             mcModule = instance;
-            updateSimulation(); 
+            updateSimulation();
         });
     }
 
-    
     const slider = document.getElementById('volSlider');
     slider.oninput = function() {
         document.getElementById('volValue').innerText = this.value + "%";
         updateSimulation();
     };
 
-    
     function updateSimulation() {
         if (!mcModule) return;
-        
         const vol = slider.value / 100.0;
-        const numPaths = 10; 
-        
+        const numPaths = 12; 
         chart.data.datasets = []; 
+
+        const colors = [
+            'rgba(99, 102, 241, 0.4)', 
+            'rgba(168, 85, 247, 0.4)', 
+            'rgba(236, 72, 153, 0.4)', 
+            'rgba(45, 212, 191, 0.4)'  
+        ];
 
         for (let p = 0; p < numPaths; p++) {
             
-            const rawPath = mcModule.get_sample_path(100.0, 0.05, vol, 1.0, 252, 42 + p);
             
+            const seed = 42 + p + Math.floor(vol * 10000); 
+            const rawPath = mcModule.get_sample_path(100.0, 0.05, vol, 1.0, 252, seed);
             const jsPath = [];
-            for (let i = 0; i < rawPath.size(); i++) {
-                jsPath.push(rawPath.get(i));
-            }
+            for (let i = 0; i < rawPath.size(); i++) jsPath.push(rawPath.get(i));
 
             chart.data.datasets.push({
-                label: `Path ${p}`,
                 data: jsPath,
-                borderColor: 'rgba(0, 123, 255, 0.25)',
-                borderWidth: 1.5,
+                borderColor: colors[p % colors.length],
+                borderWidth: 2, 
                 fill: false
             });
         }
-        chart.update();
+        chart.update('none'); 
+        chart.update(); 
+
+        
+        try {
+            const greeks = mcModule.get_greeks("european", 100.0, 100.0, 0.05, vol, 1.0, 252, 1000, 42);
+            document.getElementById('delta-value').innerText = greeks.delta.toFixed(4);
+            document.getElementById('gamma-value').innerText = greeks.gamma.toFixed(4);
+            document.getElementById('vega-value').innerText = greeks.vega.toFixed(2);
+        } catch (err) {
+            console.error("Greeks computation failed:", err);
+        }
     }
 </script>
 
@@ -128,8 +278,8 @@
 
     </div>
 
-    <footer class="text-center py-5 text-muted small">
-        &copy; 2026 Quant Engine
+    <footer class="text-center py-5 text-muted small" style="opacity: 0.5;">
+        &copy; 2026 QUANT_PORTFOLIO &bull; POWERED BY C++ WASM
     </footer>
 </body>
 </html>

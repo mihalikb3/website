@@ -13,6 +13,40 @@
     <div style="position: relative; height: 400px; width: 100%;">
         <canvas id="mcChart"></canvas>
     </div>
+
+    <!-- Greeks Display -->
+    <div class="row g-2 mt-4" id="greeks-container">
+        <div class="col">
+            <div class="p-2 rounded-3" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <div class="small mb-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #94a3b8;">Δ DELTA</div>
+                <div class="h6 m-0 text-white fw-bold" id="delta-value" style="font-family: 'JetBrains Mono', monospace;">0.0000</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="p-2 rounded-3" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <div class="small mb-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #94a3b8;">Γ GAMMA</div>
+                <div class="h6 m-0 text-white fw-bold" id="gamma-value" style="font-family: 'JetBrains Mono', monospace;">0.0000</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="p-2 rounded-3" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <div class="small mb-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #94a3b8;">ν VEGA</div>
+                <div class="h6 m-0 text-white fw-bold" id="vega-value" style="font-family: 'JetBrains Mono', monospace;">0.0000</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="p-2 rounded-3" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <div class="small mb-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #94a3b8;">Θ THETA</div>
+                <div class="h6 m-0 text-white fw-bold" id="theta-value" style="font-family: 'JetBrains Mono', monospace;">0.0000</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="p-2 rounded-3" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <div class="small mb-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #94a3b8;">ρ RHO</div>
+                <div class="h6 m-0 text-white fw-bold" id="rho-value" style="font-family: 'JetBrains Mono', monospace;">0.0000</div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -60,39 +94,19 @@
             elements: { point: { radius: 0 }, line: { tension: 0.1 } },
             scales: {
                 y: { 
-                    min: 60, max: 180, 
-                    grid: { color: 'rgba(255,255,255,0.05)' },
-                    ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }
+                    grid: { color: 'rgba(255,255,255,0.08)' },
+                    ticks: { color: '#cbd5e1', font: { family: 'JetBrains Mono', size: 10 } },
+                    grace: '10%' // Adds padding at the top and bottom of the scale
                 },
                 x: { 
-                    grid: { color: 'rgba(255,255,255,0.05)' },
-                    ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }
+                    grid: { color: 'rgba(255,255,255,0.08)' },
+                    ticks: { color: '#cbd5e1', font: { family: 'JetBrains Mono', size: 10 } }
                 }
             },
             plugins: { legend: { display: false } },
             animation: {
-                x: {
-                    type: 'number',
-                    easing: 'linear',
-                    duration: 400,
-                    from: NaN,
-                    delay(ctx) {
-                        if (ctx.type !== 'data' || ctx.xStarted) return 0;
-                        ctx.xStarted = true;
-                        return ctx.index * 1.5;
-                    }
-                },
-                y: {
-                    type: 'number',
-                    easing: 'linear',
-                    duration: 400,
-                    from: NaN,
-                    delay(ctx) {
-                        if (ctx.type !== 'data' || ctx.yStarted) return 0;
-                        ctx.yStarted = true;
-                        return ctx.index * 1.5;
-                    }
-                }
+                duration: 800,
+                easing: 'easeInOutQuart'
             }
         }
     });
@@ -138,7 +152,18 @@
                 fill: false
             });
         }
-        chart.update('none'); // Update without full animation for smoother sliding
-        chart.update(); // Then apply drawing animation
+        chart.update(); // Apply smooth transition animation
+
+        // Update Greeks Calculation
+        try {
+            const greeks = mcModule.get_greeks("european", 100.0, 100.0, 0.05, vol, 1.0, 252, 1000, 42);
+            document.getElementById('delta-value').innerText = greeks.delta.toFixed(4);
+            document.getElementById('gamma-value').innerText = greeks.gamma.toFixed(4);
+            document.getElementById('vega-value').innerText = greeks.vega.toFixed(2);
+            document.getElementById('theta-value').innerText = greeks.theta.toFixed(2);
+            document.getElementById('rho-value').innerText = greeks.rho.toFixed(2);
+        } catch (err) {
+            console.error("Greeks computation failed:", err);
+        }
     }
 </script>

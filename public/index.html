@@ -11,12 +11,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-deep: #0f172a;
-            --bg-card: rgba(30, 41, 59, 0.7);
-            --accent: #6366f1;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: rgba(255, 255, 255, 0.1);
+            --bg-deep: #020617;  
+            --bg-card: rgba(15, 23, 42, 0.8);  
+            --accent: #818cf8;  
+            --text-main: #f1f5f9;  
+            --text-muted: #cbd5e1;  
+            --border: rgba(255, 255, 255, 0.15);
         }
         
         body { 
@@ -29,7 +29,7 @@
         }
 
         .navbar { 
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(2, 6, 23, 0.8);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
             padding: 1rem 0;
@@ -47,29 +47,31 @@
         .brand-logo {
             width: 24px;
             height: 24px;
-            background: linear-gradient(135deg, var(--accent), #a855f7);
+            background: linear-gradient(135deg, var(--accent), #c084fc);
             border-radius: 6px;
         }
 
         .glass-card {
             background: var(--bg-card);
-            backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             border-radius: 24px;
             padding: 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
 
         .main-container { max-width: 1000px; margin: 60px auto; padding: 0 20px; }
         
-        h1, h2, h3 { font-weight: 700; letter-spacing: -0.03em; }
+        h1, h2, h3 { font-weight: 700; letter-spacing: -0.03em; color: #fff; }
         .text-gradient {
-            background: linear-gradient(to right, #fff, #94a3b8);
+            background: linear-gradient(to right, #fff, var(--text-muted));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         code, pre { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
+
+        .text-muted { color: var(--text-muted) !important; }
     </style>
 </head>
 <body>
@@ -109,6 +111,40 @@
 
     <div style="position: relative; height: 400px; width: 100%;">
         <canvas id="mcChart"></canvas>
+    </div>
+
+    
+    <div class="row g-2 mt-4" id="greeks-container">
+        <div class="col">
+            <div class="p-2 rounded-3" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <div class="small mb-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #94a3b8;">Δ DELTA</div>
+                <div class="h6 m-0 text-white fw-bold" id="delta-value" style="font-family: 'JetBrains Mono', monospace;">0.0000</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="p-2 rounded-3" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <div class="small mb-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #94a3b8;">Γ GAMMA</div>
+                <div class="h6 m-0 text-white fw-bold" id="gamma-value" style="font-family: 'JetBrains Mono', monospace;">0.0000</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="p-2 rounded-3" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <div class="small mb-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #94a3b8;">ν VEGA</div>
+                <div class="h6 m-0 text-white fw-bold" id="vega-value" style="font-family: 'JetBrains Mono', monospace;">0.0000</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="p-2 rounded-3" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <div class="small mb-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #94a3b8;">Θ THETA</div>
+                <div class="h6 m-0 text-white fw-bold" id="theta-value" style="font-family: 'JetBrains Mono', monospace;">0.0000</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="p-2 rounded-3" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                <div class="small mb-1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #94a3b8;">ρ RHO</div>
+                <div class="h6 m-0 text-white fw-bold" id="rho-value" style="font-family: 'JetBrains Mono', monospace;">0.0000</div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -157,39 +193,19 @@
             elements: { point: { radius: 0 }, line: { tension: 0.1 } },
             scales: {
                 y: { 
-                    min: 60, max: 180, 
-                    grid: { color: 'rgba(255,255,255,0.05)' },
-                    ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }
+                    grid: { color: 'rgba(255,255,255,0.08)' },
+                    ticks: { color: '#cbd5e1', font: { family: 'JetBrains Mono', size: 10 } },
+                    grace: '10%' 
                 },
                 x: { 
-                    grid: { color: 'rgba(255,255,255,0.05)' },
-                    ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 } }
+                    grid: { color: 'rgba(255,255,255,0.08)' },
+                    ticks: { color: '#cbd5e1', font: { family: 'JetBrains Mono', size: 10 } }
                 }
             },
             plugins: { legend: { display: false } },
             animation: {
-                x: {
-                    type: 'number',
-                    easing: 'linear',
-                    duration: 400,
-                    from: NaN,
-                    delay(ctx) {
-                        if (ctx.type !== 'data' || ctx.xStarted) return 0;
-                        ctx.xStarted = true;
-                        return ctx.index * 1.5;
-                    }
-                },
-                y: {
-                    type: 'number',
-                    easing: 'linear',
-                    duration: 400,
-                    from: NaN,
-                    delay(ctx) {
-                        if (ctx.type !== 'data' || ctx.yStarted) return 0;
-                        ctx.yStarted = true;
-                        return ctx.index * 1.5;
-                    }
-                }
+                duration: 800,
+                easing: 'easeInOutQuart'
             }
         }
     });
@@ -231,12 +247,23 @@
             chart.data.datasets.push({
                 data: jsPath,
                 borderColor: colors[p % colors.length],
-                borderWidth: p === 0 ? 3 : 1.5, 
+                borderWidth: 2, 
                 fill: false
             });
         }
-        chart.update('none'); 
         chart.update(); 
+
+        
+        try {
+            const greeks = mcModule.get_greeks("european", 100.0, 100.0, 0.05, vol, 1.0, 252, 1000, 42);
+            document.getElementById('delta-value').innerText = greeks.delta.toFixed(4);
+            document.getElementById('gamma-value').innerText = greeks.gamma.toFixed(4);
+            document.getElementById('vega-value').innerText = greeks.vega.toFixed(2);
+            document.getElementById('theta-value').innerText = greeks.theta.toFixed(2);
+            document.getElementById('rho-value').innerText = greeks.rho.toFixed(2);
+        } catch (err) {
+            console.error("Greeks computation failed:", err);
+        }
     }
 </script>
 
@@ -244,30 +271,30 @@
 
 <div class="row g-4 mt-5">
     <div class="col-md-4">
-        <div class="h-100 p-4 rounded-4" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+        <div class="h-100 p-4 rounded-4" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);">
             <div class="text-primary mb-3">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
             </div>
             <h5 class="fw-bold">C++ 20 Core</h5>
-            <p class="small text-muted mb-0">Engineered with modern C++ for ultra-low latency path generation and high-precision stochastic modeling.</p>
+            <p class="small mb-0" style="color: #94a3b8;">Engineered with modern C++ for ultra-low latency path generation and high-precision stochastic modeling.</p>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="h-100 p-4 rounded-4" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+        <div class="h-100 p-4 rounded-4" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);">
             <div class="text-info mb-3">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
             </div>
             <h5 class="fw-bold">WASM Runtime</h5>
-            <p class="small text-muted mb-0">WebAssembly bridge ensures near-native speeds, bypassing JavaScript's heavy computation overhead.</p>
+            <p class="small mb-0" style="color: #94a3b8;">WebAssembly bridge ensures near-native speeds, bypassing JavaScript's heavy computation overhead.</p>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="h-100 p-4 rounded-4" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+        <div class="h-100 p-4 rounded-4" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);">
             <div class="text-success mb-3">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
             </div>
             <h5 class="fw-bold">Path Diffusion</h5>
-            <p class="small text-muted mb-0">Supports multi-threaded simulation patterns for complex derivative pricing and risk analysis.</p>
+            <p class="small mb-0" style="color: #94a3b8;">Supports multi-threaded simulation patterns for complex derivative pricing and risk analysis.</p>
         </div>
     </div>
 </div>
